@@ -1,6 +1,5 @@
 package yjh.test.android_fcm;
 
-import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Context;
@@ -9,8 +8,6 @@ import android.media.RingtoneManager;
 import android.net.Uri;
 import android.support.v4.app.NotificationCompat;
 import android.util.Log;
-
-
 import com.google.firebase.messaging.RemoteMessage;
 
 /**
@@ -24,33 +21,38 @@ public class FirebaseMessagingService extends com.google.firebase.messaging.Fire
     @Override
     public void onMessageReceived(RemoteMessage remoteMessage) {
 
-        sendNotification(remoteMessage.getData().get("message"));
+        Log.d(TAG, "FROM" + remoteMessage.getFrom());
+
+        if (remoteMessage.getData().size() > 0) {
+            Log.d(TAG, "Message data: " + remoteMessage.getData());
+        }
+
+        if (remoteMessage.getNotification() != null) {
+            Log.d(TAG, "Message body:" + remoteMessage.getNotification().getBody());
+            sendNotification(remoteMessage.getNotification().getBody());
+        }
 
     }
 
-    private void sendNotification(String messageBody) {
+    private void sendNotification(String body) {
         Intent intent = new Intent(this, MainActivity.class);
-        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-        PendingIntent pendingIntent = PendingIntent.getActivity(this, 0 /* Request code */, intent,
-                PendingIntent.FLAG_ONE_SHOT);
+        intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
 
+        PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, intent, PendingIntent.FLAG_ONE_SHOT);
         Uri uri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
-        Notification.Builder notificationBuilder = new Notification.Builder(this)
+
+        NotificationCompat.Builder builder = new NotificationCompat.Builder(this)
                 .setSmallIcon(R.mipmap.ic_launcher)
-                .setContentTitle("FCM Push Test")
-                .setContentText(messageBody)
+                .setContentTitle("Firebase Cloud Messaging")
+                .setContentText(body)
                 .setAutoCancel(true)
-                .setSound(uri)
                 .setContentIntent(pendingIntent);
 
-
-        NotificationManager notificationManager =
-                (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
-
-        notificationManager.notify(0 /* ID of notification */, notificationBuilder.build());
-
+        NotificationManager notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+        notificationManager.notify(0, builder.build());
 
 
     }
+
 
 }
