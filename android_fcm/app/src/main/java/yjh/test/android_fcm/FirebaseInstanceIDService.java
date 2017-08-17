@@ -26,25 +26,10 @@ public class FirebaseInstanceIDService extends FirebaseInstanceIdService{
         String token=FirebaseInstanceId.getInstance().getToken();
         Log.d(TAG,"Hello : "+token);
 
-        sendRegistrationToServer(token);
     }
 
     private void sendRegistrationToServer(String token){
 
-        OkHttpClient client=new OkHttpClient();
-        RequestBody body=new FormBody.Builder()
-                .add("Token",token)
-                .build();
-
-        Request request=new Request.Builder()
-                .url("http://13.124.15.202:8080/print")
-                .post(body)
-                .build();
-
-        try{
-            client.newCall(request).execute();
-        }catch (IOException e){
-            e.printStackTrace();
-        }
+        //To server token
     }
 }
